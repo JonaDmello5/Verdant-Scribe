@@ -4,6 +4,9 @@ import { Sprout, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { SoundType } from '@/app/page';
+
 import {
   Tooltip,
   TooltipContent,
@@ -15,9 +18,11 @@ interface GardenControlsProps {
   onPlantNew: () => void;
   isSoundOn: boolean;
   onToggleSound: (checked: boolean) => void;
+  soundType: SoundType;
+  onSoundTypeChange: (value: SoundType) => void;
 }
 
-export default function GardenControls({ onPlantNew, isSoundOn, onToggleSound }: GardenControlsProps) {
+export default function GardenControls({ onPlantNew, isSoundOn, onToggleSound, soundType, onSoundTypeChange }: GardenControlsProps) {
   return (
     <div className="absolute bottom-4 left-4 z-20 flex items-center gap-4">
       <TooltipProvider>
@@ -48,6 +53,15 @@ export default function GardenControls({ onPlantNew, isSoundOn, onToggleSound }:
           onCheckedChange={onToggleSound}
           aria-label="Toggle ambient sound"
         />
+        <Select value={soundType} onValueChange={(value: SoundType) => onSoundTypeChange(value)} disabled={!isSoundOn}>
+          <SelectTrigger className="w-[120px]">
+            <SelectValue placeholder="Soundscape" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="wind">Wind</SelectItem>
+            <SelectItem value="crickets">Crickets</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

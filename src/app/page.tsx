@@ -30,36 +30,67 @@ const getThemeFromAmbiance = (description: string): string => {
   return 'theme-sunlit'; // Default to sunlit
 };
 
+export type SoundType = 'wind' | 'crickets';
+
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [compostingPostId, setCompostingPostId] = useState<number | null>(null);
+  const [soundType, setSoundType] = useState<SoundType>('wind');
 
   const [ambiance, setAmbiance] = useState("A sunlit meadow, filled with the gentle hum of life. The air is warm and the sky is clear, inviting new ideas to blossom.");
   const [isSoundOn, setIsSoundOn] = useState(false);
   const { toast } = useToast();
   
-  const synth = useRef<Tone.NoiseSynth | null>(null);
-  const filter = useRef<Tone.AutoFilter | null>(null);
+  const windSynth = useRef<Tone.NoiseSynth | null>(null);
+  const windFilter = useRef<Tone.AutoFilter | null>(null);
+  const cricketSynth = useRef<Tone.AMSynth | null>(null);
+  const cricketPanner = useRef<Tone.Panner | null>(null);
+  const cricketLoop = useRef<Tone.Loop | null>(null);
+
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
   useEffect(() => {
     const setupAudio = async () => {
       await Tone.start();
-      synth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
-      filter.current = new Tone.AutoFilter("4n").toDestination().start();
-      synth.current.connect(filter.current);
+      
+      if (soundType === 'wind') {
+        windSynth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
+        windFilter.current = new Tone.AutoFilter("4n").toDestination().start();
+        windSynth.current.connect(windFilter.current);
 
-      if (theme === 'theme-misty') {
-        filter.current.baseFrequency = 200;
-        filter.current.depth.value = 0.3;
-        synth.current.triggerAttack();
-      } else { // sunlit
-        filter.current.baseFrequency = 800;
-        filter.current.depth.value = 0.6;
-        synth.current.triggerAttack();
+        if (theme === 'theme-misty') {
+          windFilter.current.baseFrequency = 200;
+          windFilter.current.depth.value = 0.3;
+          windSynth.current.triggerAttack();
+        } else { // sunlit
+          windFilter.current.baseFrequency = 800;
+          windFilter.current.depth.value = 0.6;
+          windSynth.current.triggerAttack();
+        }
+      } else if (soundType === 'crickets') {
+        cricketSynth.current = new Tone.AMSynth({
+          harmonicity: 3,
+          detune: 0,
+          oscillator: { type: "sine" },
+          envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.5 },
+          modulation: { type: "square" },
+          modulationEnvelope: { attack: 0.5, decay: 0.0, sustain: 1, release: 0.5 }
+        }).toDestination();
+        
+        cricketPanner.current = new Tone.Panner(Math.random() * 2 - 1).toDestination();
+        cricketSynth.current.connect(cricketPanner.current);
+
+        cricketLoop.current = new Tone.Loop(time => {
+          cricketSynth.current?.triggerAttackRelease("C5", "8n", time);
+          if (cricketPanner.current) {
+            cricketPanner.current.pan.value = Math.random() * 2 - 1;
+          }
+        }, "4n").start(0);
+
+        Tone.Transport.start();
       }
     };
     
@@ -68,15 +99,21 @@ export default function Home() {
     }
 
     return () => {
-      if (synth.current) {
-        synth.current.triggerRelease();
+      if (windSynth.current) {
+        windSynth.current.triggerRelease();
         setTimeout(() => {
-          synth.current?.dispose();
-          filter.current?.dispose();
+          windSynth.current?.dispose();
+          windFilter.current?.dispose();
         }, 500);
       }
+      if (cricketLoop.current) {
+        Tone.Transport.stop();
+        cricketLoop.current.dispose();
+        cricketSynth.current?.dispose();
+        cricketPanner.current?.dispose();
+      }
     };
-  }, [isSoundOn, theme]);
+  }, [isSoundOn, theme, soundType]);
 
   const handleUpdateAmbiance = async (content: string) => {
     try {
@@ -177,6 +214,8 @@ export default function Home() {
         onPlantNew={() => setIsCreatingNew(true)}
         isSoundOn={isSoundOn}
         onToggleSound={() => setIsSoundOn(!isSoundOn)}
+        soundType={soundType}
+        onSoundTypeChange={setSoundType}
       />
 
       <PostViewer
