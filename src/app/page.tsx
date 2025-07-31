@@ -48,9 +48,7 @@ export default function Home() {
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
   
-  const cricketSynth = useRef<Tone.NoiseSynth | null>(null);
-  const cricketFilter = useRef<Tone.Filter | null>(null);
-  const cricketPanner = useRef<Tone.Panner | null>(null);
+  const cricketSynth = useRef<Tone.PolySynth | null>(null);
   const cricketLoop = useRef<Tone.Loop | null>(null);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
@@ -58,7 +56,6 @@ export default function Home() {
   const stopAllAudio = useCallback(() => {
     if (windSynth.current) {
         windSynth.current.triggerRelease();
-        // Delay disposal to allow for release envelope to finish
         setTimeout(() => {
             windSynth.current?.dispose();
             windFilter.current?.dispose();
@@ -68,14 +65,11 @@ export default function Home() {
     }
     if (cricketLoop.current) {
         Tone.Transport.stop();
+        Tone.Transport.cancel();
         cricketLoop.current.dispose();
         cricketSynth.current?.dispose();
-        cricketFilter.current?.dispose();
-        cricketPanner.current?.dispose();
         cricketLoop.current = null;
         cricketSynth.current = null;
-        cricketFilter.current = null;
-        cricketPanner.current = null;
     }
   }, []);
 
@@ -85,7 +79,7 @@ export default function Home() {
         audioInitialized.current = true;
     }
     
-    stopAllAudio(); // Stop any currently playing sound before setting up a new one.
+    stopAllAudio();
 
     if (soundType === 'wind') {
       windSynth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
@@ -102,23 +96,36 @@ export default function Home() {
       windSynth.current.triggerAttack();
 
     } else if (soundType === 'crickets') {
-        cricketSynth.current = new Tone.NoiseSynth({
-            noise: { type: "white" },
-            envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
-        });
+        cricketSynth.current = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: {
+            attack: 0.01,
+            decay: 0.15,
+            sustain: 0.05,
+            release: 0.1,
+          },
+          volume: -20,
+        }).toDestination();
         
-        cricketFilter.current = new Tone.Filter(4000, "bandpass");
-        cricketPanner.current = new Tone.Panner(0).toDestination();
-
-        cricketSynth.current.chain(cricketFilter.current, cricketPanner.current);
+        const panner = new Tone.Panner(0).toDestination();
+        cricketSynth.current.connect(panner);
 
         cricketLoop.current = new Tone.Loop(time => {
-          if (cricketSynth.current && cricketPanner.current) {
-            cricketSynth.current.triggerAttack(time);
-            cricketPanner.current.pan.rampTo(Math.random() * 2 - 1, 0.5);
+          if (cricketSynth.current) {
+              const freq = Math.random() * 2000 + 3000; // Chirp between 3kHz and 5kHz
+              const duration = Math.random() * 0.1 + 0.05; // short chirp
+              cricketSynth.current.triggerAttackRelease(freq, duration, time);
+              
+              // Add a second, quick chirp for realism
+              if (Math.random() > 0.6) {
+                cricketSynth.current.triggerAttackRelease(freq * 1.02, duration * 0.5, time + duration + 0.02);
+              }
+              
+              panner.pan.rampTo(Math.random() * 2 - 1, 0.5);
           }
-        }, "8n").start(0);
-
+        }, "4n").start(0);
+        
+        Tone.Transport.bpm.value = 100;
         Tone.Transport.start();
     }
   }, [soundType, theme, stopAllAudio]);
@@ -131,7 +138,6 @@ export default function Home() {
     }
 
     return () => {
-      // Cleanup on component unmount
       stopAllAudio();
     };
   }, [isSoundOn, setupAudio, stopAllAudio]);
