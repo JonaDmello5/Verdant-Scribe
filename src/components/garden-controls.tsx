@@ -17,7 +17,7 @@ import {
 interface GardenControlsProps {
   onPlantNew: () => void;
   isSoundOn: boolean;
-  onToggleSound: (checked: boolean) => void;
+  onToggleSound: () => void;
   soundType: SoundType;
   onSoundTypeChange: (value: SoundType) => void;
 }

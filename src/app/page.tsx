@@ -44,76 +44,98 @@ export default function Home() {
   const [isSoundOn, setIsSoundOn] = useState(false);
   const { toast } = useToast();
   
+  const audioInitialized = useRef(false);
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
-  const cricketSynth = useRef<Tone.AMSynth | null>(null);
+  
+  const cricketSynth = useRef<Tone.NoiseSynth | null>(null);
+  const cricketFilter = useRef<Tone.Filter | null>(null);
   const cricketPanner = useRef<Tone.Panner | null>(null);
   const cricketLoop = useRef<Tone.Loop | null>(null);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
-  useEffect(() => {
-    const setupAudio = async () => {
-      await Tone.start();
-      
-      if (soundType === 'wind') {
-        windSynth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
-        windFilter.current = new Tone.AutoFilter("4n").toDestination().start();
-        windSynth.current.connect(windFilter.current);
-
-        if (theme === 'theme-misty') {
-          windFilter.current.baseFrequency = 200;
-          windFilter.current.depth.value = 0.3;
-          windSynth.current.triggerAttack();
-        } else { // sunlit
-          windFilter.current.baseFrequency = 800;
-          windFilter.current.depth.value = 0.6;
-          windSynth.current.triggerAttack();
-        }
-      } else if (soundType === 'crickets') {
-        cricketSynth.current = new Tone.AMSynth({
-          harmonicity: 3,
-          detune: 0,
-          oscillator: { type: "sine" },
-          envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.5 },
-          modulation: { type: "square" },
-          modulationEnvelope: { attack: 0.5, decay: 0.0, sustain: 1, release: 0.5 }
-        }).toDestination();
-        
-        cricketPanner.current = new Tone.Panner(Math.random() * 2 - 1).toDestination();
-        cricketSynth.current.connect(cricketPanner.current);
-
-        cricketLoop.current = new Tone.Loop(time => {
-          cricketSynth.current?.triggerAttackRelease("C5", "8n", time);
-          if (cricketPanner.current) {
-            cricketPanner.current.pan.value = Math.random() * 2 - 1;
-          }
-        }, "4n").start(0);
-
-        Tone.Transport.start();
-      }
-    };
-    
-    if (isSoundOn) {
-      setupAudio();
-    }
-
-    return () => {
-      if (windSynth.current) {
+  const stopAllAudio = useCallback(() => {
+    if (windSynth.current) {
         windSynth.current.triggerRelease();
+        // Delay disposal to allow for release envelope to finish
         setTimeout(() => {
-          windSynth.current?.dispose();
-          windFilter.current?.dispose();
+            windSynth.current?.dispose();
+            windFilter.current?.dispose();
+            windSynth.current = null;
+            windFilter.current = null;
         }, 500);
-      }
-      if (cricketLoop.current) {
+    }
+    if (cricketLoop.current) {
         Tone.Transport.stop();
         cricketLoop.current.dispose();
         cricketSynth.current?.dispose();
+        cricketFilter.current?.dispose();
         cricketPanner.current?.dispose();
+        cricketLoop.current = null;
+        cricketSynth.current = null;
+        cricketFilter.current = null;
+        cricketPanner.current = null;
+    }
+  }, []);
+
+  const setupAudio = useCallback(async () => {
+    if (!audioInitialized.current) {
+        await Tone.start();
+        audioInitialized.current = true;
+    }
+    
+    stopAllAudio(); // Stop any currently playing sound before setting up a new one.
+
+    if (soundType === 'wind') {
+      windSynth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
+      windFilter.current = new Tone.AutoFilter("4n").toDestination().start();
+      windSynth.current.connect(windFilter.current);
+
+      if (theme === 'theme-misty') {
+        windFilter.current.baseFrequency = 200;
+        windFilter.current.depth.value = 0.3;
+      } else { // sunlit
+        windFilter.current.baseFrequency = 800;
+        windFilter.current.depth.value = 0.6;
       }
+      windSynth.current.triggerAttack();
+
+    } else if (soundType === 'crickets') {
+        cricketSynth.current = new Tone.NoiseSynth({
+            noise: { type: "white" },
+            envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
+        });
+        
+        cricketFilter.current = new Tone.Filter(4000, "bandpass");
+        cricketPanner.current = new Tone.Panner(0).toDestination();
+
+        cricketSynth.current.chain(cricketFilter.current, cricketPanner.current);
+
+        cricketLoop.current = new Tone.Loop(time => {
+          if (cricketSynth.current && cricketPanner.current) {
+            cricketSynth.current.triggerAttack(time);
+            cricketPanner.current.pan.rampTo(Math.random() * 2 - 1, 0.5);
+          }
+        }, "8n").start(0);
+
+        Tone.Transport.start();
+    }
+  }, [soundType, theme, stopAllAudio]);
+
+  useEffect(() => {
+    if (isSoundOn) {
+      setupAudio();
+    } else {
+      stopAllAudio();
+    }
+
+    return () => {
+      // Cleanup on component unmount
+      stopAllAudio();
     };
-  }, [isSoundOn, theme, soundType]);
+  }, [isSoundOn, setupAudio, stopAllAudio]);
+
 
   const handleUpdateAmbiance = async (content: string) => {
     try {
@@ -164,6 +186,17 @@ export default function Home() {
       setCompostingPostId(null);
     }, 1000); // Match animation duration
   };
+  
+  const handleToggleSound = () => {
+      const turnOn = !isSoundOn;
+      setIsSoundOn(turnOn);
+      if (turnOn && !audioInitialized.current) {
+          Tone.start().then(() => {
+              audioInitialized.current = true;
+              setupAudio();
+          });
+      }
+  };
 
   const renderPlant = (post: Post) => {
     const PlantComponent = {
@@ -213,9 +246,15 @@ export default function Home() {
       <GardenControls
         onPlantNew={() => setIsCreatingNew(true)}
         isSoundOn={isSoundOn}
-        onToggleSound={() => setIsSoundOn(!isSoundOn)}
+        onToggleSound={handleToggleSound}
         soundType={soundType}
-        onSoundTypeChange={setSoundType}
+        onSoundTypeChange={(newSound) => {
+            if (isSoundOn) {
+                setSoundType(newSound);
+            } else {
+                 setSoundType(newSound);
+            }
+        }}
       />
 
       <PostViewer
