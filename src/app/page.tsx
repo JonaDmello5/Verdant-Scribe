@@ -19,6 +19,9 @@ const initialPosts: Post[] = [
   { id: 3, title: "Winding Paths", content: "A short story, a narrative that twists and turns. It doesn't follow a straight line, but meanders through different perspectives, much like a vine finding its way.", type: 'vine', position: { x: 45, y: 50 }, growth: 0.8 },
 ];
 
+// Base64 encoded WAV file for realistic cricket sounds
+const cricketAudioData = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhCAAAAAEA";
+
 const getThemeFromAmbiance = (description: string): string => {
   const lowerCaseDesc = description.toLowerCase();
   if (lowerCaseDesc.includes('misty') || lowerCaseDesc.includes('moonlit') || lowerCaseDesc.includes('somber')) {
@@ -47,9 +50,7 @@ export default function Home() {
   const audioInitialized = useRef(false);
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
-  
-  const cricketSynth = useRef<Tone.PolySynth | null>(null);
-  const cricketLoop = useRef<Tone.Loop | null>(null);
+  const cricketPlayer = useRef<Tone.Player | null>(null);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
@@ -63,13 +64,10 @@ export default function Home() {
             windFilter.current = null;
         }, 500);
     }
-    if (cricketLoop.current) {
-        Tone.Transport.stop();
-        Tone.Transport.cancel();
-        cricketLoop.current.dispose();
-        cricketSynth.current?.dispose();
-        cricketLoop.current = null;
-        cricketSynth.current = null;
+    if (cricketPlayer.current) {
+      cricketPlayer.current.stop();
+      cricketPlayer.current.dispose();
+      cricketPlayer.current = null;
     }
   }, []);
 
@@ -96,39 +94,19 @@ export default function Home() {
       windSynth.current.triggerAttack();
 
     } else if (soundType === 'crickets') {
-        cricketSynth.current = new Tone.PolySynth(Tone.Synth, {
-          oscillator: { type: 'sine' },
-          envelope: {
-            attack: 0.01,
-            decay: 0.15,
-            sustain: 0.05,
-            release: 0.1,
-          },
-          volume: -20,
+        cricketPlayer.current = new Tone.Player({
+          url: cricketAudioData,
+          loop: true,
+          fadeIn: 2,
+          fadeOut: 2,
         }).toDestination();
         
-        const panner = new Tone.Panner(0).toDestination();
-        cricketSynth.current.connect(panner);
-
-        cricketLoop.current = new Tone.Loop(time => {
-          if (cricketSynth.current) {
-              const freq = Math.random() * 2000 + 3000; // Chirp between 3kHz and 5kHz
-              const duration = Math.random() * 0.1 + 0.05; // short chirp
-              cricketSynth.current.triggerAttackRelease(freq, duration, time);
-              
-              // Add a second, quick chirp for realism
-              if (Math.random() > 0.6) {
-                cricketSynth.current.triggerAttackRelease(freq * 1.02, duration * 0.5, time + duration + 0.02);
-              }
-              
-              panner.pan.rampTo(Math.random() * 2 - 1, 0.5);
-          }
-        }, "4n").start(0);
-        
-        Tone.Transport.bpm.value = 100;
-        Tone.Transport.start();
+        await Tone.loaded();
+        if (cricketPlayer.current && isSoundOn) {
+            cricketPlayer.current.start();
+        }
     }
-  }, [soundType, theme, stopAllAudio]);
+  }, [soundType, theme, stopAllAudio, isSoundOn]);
 
   useEffect(() => {
     if (isSoundOn) {
@@ -193,16 +171,16 @@ export default function Home() {
     }, 1000); // Match animation duration
   };
   
-  const handleToggleSound = () => {
+  const handleToggleSound = useCallback(() => {
       const turnOn = !isSoundOn;
       setIsSoundOn(turnOn);
       if (turnOn && !audioInitialized.current) {
           Tone.start().then(() => {
               audioInitialized.current = true;
-              setupAudio();
+              // No need to call setupAudio here, the useEffect will handle it
           });
       }
-  };
+  }, [isSoundOn]);
 
   const renderPlant = (post: Post) => {
     const PlantComponent = {
@@ -255,11 +233,7 @@ export default function Home() {
         onToggleSound={handleToggleSound}
         soundType={soundType}
         onSoundTypeChange={(newSound) => {
-            if (isSoundOn) {
-                setSoundType(newSound);
-            } else {
-                 setSoundType(newSound);
-            }
+          setSoundType(newSound);
         }}
       />
 

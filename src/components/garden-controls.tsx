@@ -53,7 +53,7 @@ export default function GardenControls({ onPlantNew, isSoundOn, onToggleSound, s
           onCheckedChange={onToggleSound}
           aria-label="Toggle ambient sound"
         />
-        <Select value={soundType} onValueChange={(value: SoundType) => onSoundTypeChange(value)} disabled={!isSoundOn}>
+        <Select value={soundType} onValueChange={(value: SoundType) => onSoundTypeChange(value)} >
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Soundscape" />
           </SelectTrigger>
