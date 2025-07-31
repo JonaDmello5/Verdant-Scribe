@@ -19,12 +19,9 @@ const initialPosts: Post[] = [
   { id: 3, title: "Winding Paths", content: "A short story, a narrative that twists and turns. It doesn't follow a straight line, but meanders through different perspectives, much like a vine finding its way.", type: 'vine', position: { x: 45, y: 50 }, growth: 0.8 },
 ];
 
-// Base64 encoded WAV file for realistic cricket sounds
-const cricketAudioData = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhCAAAAAEA";
-
 const getThemeFromAmbiance = (description: string): string => {
   const lowerCaseDesc = description.toLowerCase();
-  if (lowerCaseDesc.includes('misty') || lowerCaseDesc.includes('moonlit') || lowerCaseDesc.includes('somber')) {
+  if (lowerCaseDesc.includes('misty') || lowerCaseDesc.includes('moonlit') || lowerCaseDesc.includes('somber') || lowerCaseDesc.includes('rain')) {
     return 'theme-misty';
   }
   if (lowerCaseDesc.includes('sunlit') || lowerCaseDesc.includes('meadow') || lowerCaseDesc.includes('uplifting')) {
@@ -33,7 +30,7 @@ const getThemeFromAmbiance = (description: string): string => {
   return 'theme-sunlit'; // Default to sunlit
 };
 
-export type SoundType = 'wind' | 'crickets';
+export type SoundType = 'wind' | 'rain';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -50,7 +47,7 @@ export default function Home() {
   const audioInitialized = useRef(false);
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
-  const cricketPlayer = useRef<Tone.Player | null>(null);
+  const rainSynth = useRef<Tone.NoiseSynth | null>(null);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
@@ -64,10 +61,12 @@ export default function Home() {
             windFilter.current = null;
         }, 500);
     }
-    if (cricketPlayer.current) {
-      cricketPlayer.current.stop();
-      cricketPlayer.current.dispose();
-      cricketPlayer.current = null;
+    if (rainSynth.current) {
+      rainSynth.current.triggerRelease();
+      setTimeout(() => {
+        rainSynth.current?.dispose();
+        rainSynth.current = null;
+      }, 500);
     }
   }, []);
 
@@ -79,8 +78,10 @@ export default function Home() {
     
     stopAllAudio();
 
+    if (!isSoundOn) return;
+
     if (soundType === 'wind') {
-      windSynth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
+      windSynth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, volume: -20, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
       windFilter.current = new Tone.AutoFilter("4n").toDestination().start();
       windSynth.current.connect(windFilter.current);
 
@@ -93,32 +94,23 @@ export default function Home() {
       }
       windSynth.current.triggerAttack();
 
-    } else if (soundType === 'crickets') {
-        cricketPlayer.current = new Tone.Player({
-          url: cricketAudioData,
-          loop: true,
-          fadeIn: 2,
-          fadeOut: 2,
+    } else if (soundType === 'rain') {
+        rainSynth.current = new Tone.NoiseSynth({
+          noise: { type: "brown" },
+          volume: -12,
+          envelope: { attack: 0.005, decay: 0.1, sustain: 1 }
         }).toDestination();
-        
-        await Tone.loaded();
-        if (cricketPlayer.current && isSoundOn) {
-            cricketPlayer.current.start();
-        }
+        rainSynth.current.triggerAttack();
     }
   }, [soundType, theme, stopAllAudio, isSoundOn]);
 
   useEffect(() => {
-    if (isSoundOn) {
-      setupAudio();
-    } else {
-      stopAllAudio();
-    }
+    setupAudio();
 
     return () => {
       stopAllAudio();
     };
-  }, [isSoundOn, setupAudio, stopAllAudio]);
+  }, [isSoundOn, soundType, theme, setupAudio, stopAllAudio]);
 
 
   const handleUpdateAmbiance = async (content: string) => {
@@ -177,7 +169,6 @@ export default function Home() {
       if (turnOn && !audioInitialized.current) {
           Tone.start().then(() => {
               audioInitialized.current = true;
-              // No need to call setupAudio here, the useEffect will handle it
           });
       }
   }, [isSoundOn]);
