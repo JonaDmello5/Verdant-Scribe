@@ -30,7 +30,7 @@ const getThemeFromAmbiance = (description: string): string => {
   return 'theme-sunlit'; // Default to sunlit
 };
 
-export type SoundType = 'wind' | 'rain';
+export type SoundType = 'wind' | 'rain' | 'crickets';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -48,6 +48,9 @@ export default function Home() {
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
   const rainSynth = useRef<Tone.NoiseSynth | null>(null);
+  const cricketSynths = useRef<Tone.PulseOscillator[]>([]);
+  const cricketEnvs = useRef<Tone.AmplitudeEnvelope[]>([]);
+  const cricketLoops = useRef<Tone.Loop[]>([]);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
@@ -68,6 +71,12 @@ export default function Home() {
         rainSynth.current = null;
       }, 500);
     }
+    cricketLoops.current.forEach(loop => loop.stop(0).dispose());
+    cricketSynths.current.forEach(synth => synth.stop(0).dispose());
+    cricketEnvs.current.forEach(env => env.dispose());
+    cricketLoops.current = [];
+    cricketSynths.current = [];
+    cricketEnvs.current = [];
   }, []);
 
   const setupAudio = useCallback(async () => {
@@ -101,6 +110,31 @@ export default function Home() {
           envelope: { attack: 0.005, decay: 0.1, sustain: 1 }
         }).toDestination();
         rainSynth.current.triggerAttack();
+    } else if (soundType === 'crickets') {
+        const createCricket = (freq: number, interval: Tone.Unit.Time, volume: number, width: number) => {
+          const env = new Tone.AmplitudeEnvelope({
+            attack: 0.01,
+            decay: 0.2,
+            sustain: 0.1,
+            release: 0.1,
+          }).toDestination();
+          
+          const synth = new Tone.PulseOscillator(freq, width).connect(env).start();
+          env.volume.value = volume;
+
+          const loop = new Tone.Loop(time => {
+            env.triggerAttackRelease('16n', time);
+          }, interval).start(Math.random() * interval);
+
+          cricketSynths.current.push(synth);
+          cricketEnvs.current.push(env);
+          cricketLoops.current.push(loop);
+        };
+        
+        createCricket(4000, '1.5s', -18, 0.4);
+        createCricket(4500, '2.1s', -22, 0.5);
+        createCricket(3800, '3s', -25, 0.6);
+        Tone.Transport.start();
     }
   }, [soundType, theme, stopAllAudio, isSoundOn]);
 
@@ -109,6 +143,7 @@ export default function Home() {
 
     return () => {
       stopAllAudio();
+      Tone.Transport.stop();
     };
   }, [isSoundOn, soundType, theme, setupAudio, stopAllAudio]);
 

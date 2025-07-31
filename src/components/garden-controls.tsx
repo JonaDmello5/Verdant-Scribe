@@ -60,6 +60,7 @@ export default function GardenControls({ onPlantNew, isSoundOn, onToggleSound, s
           <SelectContent>
             <SelectItem value="wind">Wind</SelectItem>
             <SelectItem value="rain">Rain</SelectItem>
+            <SelectItem value="crickets">Crickets</SelectItem>
           </SelectContent>
         </Select>
       </div>
