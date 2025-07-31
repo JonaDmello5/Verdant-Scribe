@@ -46,8 +46,8 @@ export default function Home() {
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
   useEffect(() => {
-    if (isSoundOn) {
-      Tone.start();
+    const setupAudio = async () => {
+      await Tone.start();
       synth.current = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.5, decay: 0.1, sustain: 0.3, release: 0.5 } }).toDestination();
       filter.current = new Tone.AutoFilter("4n").toDestination().start();
       synth.current.connect(filter.current);
@@ -61,6 +61,10 @@ export default function Home() {
         filter.current.depth.value = 0.6;
         synth.current.triggerAttack();
       }
+    };
+    
+    if (isSoundOn) {
+      setupAudio();
     }
 
     return () => {
@@ -78,10 +82,6 @@ export default function Home() {
     try {
       const result = await setGardenAmbiance({ latestPostContent: content });
       setAmbiance(result.ambianceDescription);
-      toast({
-        title: "Ambiance Updated",
-        description: "The garden's mood has shifted.",
-      });
     } catch (error) {
       console.error("Failed to set ambiance:", error);
        toast({
