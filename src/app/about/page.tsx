@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Mail, Github, Leaf, TreeDeciduous, Grape, Scissors, Sprout, Footprints } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export const metadata = {
   title: 'About | Verdant Scribe',
@@ -59,14 +60,7 @@ export default function About() {
         </header>
 
         <section className="flex flex-col md:flex-row items-center gap-12 mb-20">
-            <Image
-                src="https://placehold.co/150x150.png"
-                alt="Founders Portrait"
-                width={150}
-                height={150}
-                className="rounded-full shadow-lg"
-                data-ai-hint="portrait people"
-            />
+            <Logo className="w-48 h-48 text-foreground" />
             <div className="prose dark:prose-invert max-w-none">
                 <p className="text-xl leading-relaxed">
                     🌱 Verdant Scribe is a digital garden tended by <strong>Salakha and Patil</strong>, two creators passionate about mindful productivity, sustainable technology, and the quiet power of words. We believe that the process of writing and thinking should be as natural and life-giving as tending to a garden.
