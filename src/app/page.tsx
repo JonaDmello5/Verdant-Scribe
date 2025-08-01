@@ -81,6 +81,7 @@ export default function Home() {
     cricketEnvs.current = [];
     cricketGains.current = [];
     Tone.Transport.stop();
+    Tone.Transport.cancel();
   }, []);
 
   const setupAudio = useCallback(async () => {
@@ -128,7 +129,7 @@ export default function Home() {
 
           const loop = new Tone.Loop(time => {
             env.triggerAttackRelease('16n', time);
-          }, interval).start(Math.random() * interval);
+          }, interval).start(Math.random() * Tone.Time(interval).toSeconds());
 
           cricketSynths.current.push(synth);
           cricketEnvs.current.push(env);
