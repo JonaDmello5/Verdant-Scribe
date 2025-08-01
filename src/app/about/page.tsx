@@ -69,7 +69,7 @@ export default function About() {
             />
             <div className="prose dark:prose-invert max-w-none">
                 <p className="text-xl leading-relaxed">
-                    🌱 Verdant Scribe is a digital garden tended by <strong>Joey and Atharv</strong>, two creators passionate about mindful productivity, sustainable technology, and the quiet power of words. We believe that the process of writing and thinking should be as natural and life-giving as tending to a garden.
+                    🌱 Verdant Scribe is a digital garden tended by <strong>Salakha and Patil</strong>, two creators passionate about mindful productivity, sustainable technology, and the quiet power of words. We believe that the process of writing and thinking should be as natural and life-giving as tending to a garden.
                 </p>
             </div>
         </section>

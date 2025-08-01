@@ -65,7 +65,7 @@ export default function Terms() {
       
       <h2>6. Limitation of Liability</h2>
       <p>
-        To the fullest extent permitted by law, Verdant Scribe and its creators (Joey and Atharv) will not be liable for any indirect, incidental, or consequential damages arising from your use of the service. We provide the tools, but how you use them and the results of that use are your own.
+        To the fullest extent permitted by law, Verdant Scribe and its creators (Salakha and Patil) will not be liable for any indirect, incidental, or consequential damages arising from your use of the service. We provide the tools, but how you use them and the results of that use are your own.
       </p>
 
       <h2>7. Questions?</h2>
