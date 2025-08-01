@@ -127,7 +127,7 @@ export default function PostViewer({ post, onClose, onUpdateGrowth, onEdit, onCo
                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This will permanently compost this post. It will gently fade away to enrich the soil for new ideas.
-                  </dAlertDialogDescription>
+                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
