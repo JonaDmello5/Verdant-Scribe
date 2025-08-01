@@ -30,7 +30,7 @@ const getThemeFromAmbiance = (description: string): string => {
   return 'theme-sunlit'; // Default to sunlit
 };
 
-export type SoundType = 'wind' | 'rain' | 'crickets';
+export type SoundType = 'wind' | 'rain';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -48,10 +48,6 @@ export default function Home() {
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
   const rainSynth = useRef<Tone.NoiseSynth | null>(null);
-  const cricketSynths = useRef<Tone.PulseOscillator[]>([]);
-  const cricketEnvs = useRef<Tone.AmplitudeEnvelope[]>([]);
-  const cricketLoops = useRef<Tone.Loop[]>([]);
-  const cricketGains = useRef<Tone.Gain[]>([]);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
@@ -72,14 +68,6 @@ export default function Home() {
         rainSynth.current = null;
       }, 500);
     }
-    cricketLoops.current.forEach(loop => loop.stop(0).dispose());
-    cricketSynths.current.forEach(synth => synth.stop(0).dispose());
-    cricketEnvs.current.forEach(env => env.dispose());
-    cricketGains.current.forEach(gain => gain.dispose());
-    cricketLoops.current = [];
-    cricketSynths.current = [];
-    cricketEnvs.current = [];
-    cricketGains.current = [];
     Tone.Transport.stop();
     Tone.Transport.cancel();
   }, []);
@@ -115,32 +103,6 @@ export default function Home() {
           envelope: { attack: 0.005, decay: 0.1, sustain: 1 }
         }).toDestination();
         rainSynth.current.triggerAttack();
-    } else if (soundType === 'crickets') {
-        const createCricket = (freq: number, interval: Tone.Unit.Time, volume: number, width: number) => {
-          const gainNode = new Tone.Gain(volume).toDestination();
-          const env = new Tone.AmplitudeEnvelope({
-            attack: 0.01,
-            decay: 0.2,
-            sustain: 0.1,
-            release: 0.1,
-          }).connect(gainNode);
-          
-          const synth = new Tone.PulseOscillator(freq, width).connect(env).start();
-
-          const loop = new Tone.Loop(time => {
-            env.triggerAttackRelease('16n', time);
-          }, interval).start(Math.random() * Tone.Time(interval).toSeconds());
-
-          cricketSynths.current.push(synth);
-          cricketEnvs.current.push(env);
-          cricketLoops.current.push(loop);
-          cricketGains.current.push(gainNode);
-        };
-        
-        createCricket(4000, '1.5s', -18, 0.4);
-        createCricket(4500, '2.1s', -22, 0.5);
-        createCricket(3800, '3s', -25, 0.6);
-        Tone.Transport.start();
     }
   }, [soundType, theme, stopAllAudio, isSoundOn]);
 
@@ -264,7 +226,7 @@ export default function Home() {
         onToggleSound={handleToggleSound}
         soundType={soundType}
         onSoundTypeChange={(newSound) => {
-          setSoundType(newSound);
+          setSoundType(newSound as SoundType);
         }}
       />
 
