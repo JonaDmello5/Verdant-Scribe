@@ -1,4 +1,4 @@
-# Firebase Studio
+# Verdant Scribe
 
 This is a NextJS starter in Firebase Studio.
 
