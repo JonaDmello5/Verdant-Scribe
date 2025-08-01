@@ -106,11 +106,15 @@ export function BonsaiIcon({ growth, ...props }: PlantIconProps) {
       style={{ transform: `scale(${0.5 + growth * 0.8})`, opacity: 0.5 + growth * 0.5, transition: 'transform 0.5s, opacity 0.5s' }}
       {...props}
     >
-      <path d="M12 20h.01" />
-      <path d="M10 20v-2.5c0-.83.67-1.5 1.5-1.5h1c.83 0 1.5.67 1.5 1.5V20" stroke="#a16207" strokeWidth={1.5 + growth} />
-      <path d="M14 17.5c0-1.16-.84-2.5-2-2.5s-2 1.34-2 2.5" stroke="#a16207" strokeWidth={1.5 + growth} />
-      {growth > 0.3 && <path d="M16 16c0-1.5-1-3-4-3s-4 1.5-4 3" fill="#166534" stroke="#15803d" strokeWidth={1 + growth} />}
-      <path d="M3 20h18" stroke="#78350f" strokeWidth="2" />
+      <path d="M4 20h16" stroke="#78350f" strokeWidth="2" />
+      <path d="M10 20v-3c0-1.1.9-2 2-2h0" stroke="#a16207" strokeWidth={1.5 + growth * 0.5} />
+      <path d="M12 15s-2 0-2-2c0-2 2-2 2-2" stroke="#a16207" strokeWidth={1.5 + growth * 0.5} />
+      <path d="M14 20v-4c0-1.1-.9-2-2-2h0" stroke="#a16207" strokeWidth={1.5 + growth * 0.5} />
+      <path d="M12 14s2 0 2-2c0-2-2-2-2-2" stroke="#a16207" strokeWidth={1.5 + growth * 0.5} />
+      
+      {growth > 0.2 && <circle cx="8" cy="11.5" r={2.5 + growth} fill="#166534" stroke="#15803d" />}
+      {growth > 0.5 && <circle cx="15" cy="12.5" r={3 + growth} fill="#16a34a" stroke="#15803d" />}
+      {growth > 0.8 && <circle cx="11" cy="8" r={2 + growth} fill="#22c55e" stroke="#16a34a" />}
     </svg>
   );
 }
@@ -124,16 +128,23 @@ export function WildflowerIcon({ growth, ...props }: PlantIconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1.2"
       strokeLinecap="round"
       strokeLinejoin="round"
       style={{ transform: `scale(${0.5 + growth * 0.8})`, opacity: 0.5 + growth * 0.5, transition: 'transform 0.5s, opacity 0.5s' }}
       {...props}
     >
-      {growth > 0.2 && <path d="M12 22V12" stroke="#4d7c0f" strokeWidth={1 + growth} />}
-      <path d="M12 12 a 2 2 0 0 1 0 -4" fill="#fbbf24" transform="rotate(20 12 10)" />
-      <path d="M12 12 a 2 2 0 0 1 0 -4" fill="#f472b6" transform="rotate(160 12 10)"/>
-      <path d="M12 12 a 2 2 0 0 1 0 -4" fill="#60a5fa" transform="rotate(280 12 10)"/>
+      <g transform={`scale(${growth + 0.5}) translate(-6, -6)`}>
+        {growth > 0.1 && <path d="M12 22V10" stroke="#378805" strokeWidth={1 + growth} />}
+        {growth > 0.3 && <path d="M12 16L8 12" stroke="#378805" strokeWidth={1 + growth} />}
+        {growth > 0.5 && <path d="M12 14L15 11" stroke="#378805" strokeWidth={1 + growth} />}
+
+        <ellipse cx="10" cy="8" rx="2" ry="3" fill="#8b5cf6" transform="rotate(-30 10 8)" />
+        <ellipse cx="15" cy="7" rx="2.5" ry="3.5" fill="#ec4899" transform="rotate(20 15 7)" style={{ opacity: Math.max(0, (growth - 0.4) * 2.5) }} />
+        <ellipse cx="12" cy="3" rx="2" ry="3" fill="#3b82f6" transform="rotate(10 12 3)" style={{ opacity: Math.max(0, (growth - 0.7) * 3) }} />
+
+        <circle cx="12" cy="10" r={1.5} fill="#fde047" stroke="#eab308" strokeWidth="0.5" />
+      </g>
     </svg>
   );
 }
@@ -153,11 +164,11 @@ export function MushroomIcon({ growth, ...props }: PlantIconProps) {
       style={{ transform: `scale(${0.5 + growth * 0.8})`, opacity: 0.5 + growth * 0.5, transition: 'transform 0.5s, opacity 0.5s' }}
       {...props}
     >
-      <path d="M20 11.5c0-4.42-3.58-8-8-8s-8 3.58-8 8" fill="#ef4444" stroke="#b91c1c" strokeWidth={1 + growth} />
-      <path d="M12 21.5v-10" stroke="#fde68a" strokeWidth={1.5 + growth} />
-      {growth > 0.5 && <circle cx="10" cy="8" r="0.5" fill="white" />}
-      {growth > 0.6 && <circle cx="14" cy="8" r="0.5" fill="white" />}
-      {growth > 0.7 && <circle cx="12" cy="5" r="0.5" fill="white" />}
+      <path d={`M4 11.5c0-4.42 3.58-8 8-8s8 3.58 8 8a${3 + growth * 2} ${3 + growth * 2} 0 0 1 -16 0z`} fill="#ef4444" stroke="#b91c1c" strokeWidth="1.5" />
+      <path d="M12 21.5v-10" stroke="#fef3c7" strokeWidth={1.5 + growth * 2} />
+      {growth > 0.5 && <circle cx="10" cy="8.5" r="0.8" fill="#fde047" />}
+      {growth > 0.6 && <circle cx="14" cy="8.5" r="1" fill="#fde047" />}
+      {growth > 0.7 && <circle cx="12" cy="5.5" r="0.7" fill="#fde047" />}
     </svg>
   );
 }
