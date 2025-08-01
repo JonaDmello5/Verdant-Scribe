@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { Post, PlantType } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sprout } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import PostViewer from '@/components/post-viewer';
 import PostEditor from '@/components/post-editor';
 import GardenControls from '@/components/garden-controls';
@@ -12,10 +11,11 @@ import { FlowerIcon, TreeIcon, VineIcon } from '@/components/plant-icons';
 import { setGardenAmbiance } from '@/ai/flows/set-garden-ambiance';
 import { useToast } from "@/hooks/use-toast";
 import * as Tone from 'tone';
+import Header from '@/components/header';
 
 const initialPosts: Post[] = [
   { id: 1, title: "First Sprout", content: "This is the first entry in my digital garden. A small idea, a seed of thought, planted and waiting to grow. The journey begins with a single step, or in this case, a single word.", type: 'flower', position: { x: 20, y: 30 }, growth: 0.4 },
-  { id: 2, title: "A Sturdy Thought", content: "Some ideas are like trees, they take time to root and develop. This is one such thought, a long-form piece on the nature of creativity and the slow, deliberate process of building something meaningful.", type: 'tree', position: { x: 70, y: 65 }, growth: 0.6 },
+  { id: 2, title: "A Sturdy Thought", content: "Some ideas are like trees, they take time to root and develop. This is one such thought, a long-form piece on the nature of creativity and the slow, deliberate process of building something meaningful. This can be a long text to check the reading time functionality. The average reading speed is about 200 to 250 words per minute. So a text of about 400 words should take about 2 minutes to read. I will keep writing to make sure the text is long enough for testing purposes. More words, more words, more words. The more words the better the test. This is getting a bit repetitive, but it's for a good cause. We are building a beautiful and mindful application here. And that requires some dedication and some long texts for testing. I think this should be enough now.", type: 'tree', position: { x: 70, y: 65 }, growth: 0.6 },
   { id: 3, title: "Winding Paths", content: "A short story, a narrative that twists and turns. It doesn't follow a straight line, but meanders through different perspectives, much like a vine finding its way.", type: 'vine', position: { x: 45, y: 50 }, growth: 0.8 },
 ];
 
@@ -44,7 +44,8 @@ export default function Home() {
 
   const gardenRef = useRef<HTMLElement>(null);
 
-  const [ambiance, setAmbiance] = useState("A sunlit meadow, filled with the gentle hum of life. The air is warm and the sky is clear, inviting new ideas to blossom.");
+  const [ambiance, setAmbiance] = useState<string | null>(null);
+  const [ambianceLoading, setAmbianceLoading] = useState(true);
   const [isSoundOn, setIsSoundOn] = useState(false);
   const { toast } = useToast();
   
@@ -55,7 +56,7 @@ export default function Home() {
   const padSynth = useRef<Tone.PolySynth | null>(null);
   const padSequence = useRef<Tone.Sequence | null>(null);
 
-  const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
+  const theme = useMemo(() => getThemeFromAmbiance(ambiance || ''), [ambiance]);
 
   const stopAllAudio = useCallback(() => {
     if (windSynth.current) {
@@ -160,7 +161,8 @@ export default function Home() {
   }, [isSoundOn, soundType, theme, setupAudio, stopAllAudio]);
 
 
-  const handleUpdateAmbiance = async (content: string) => {
+  const handleUpdateAmbiance = useCallback(async (content: string) => {
+    setAmbianceLoading(true);
     try {
       const result = await setGardenAmbiance({ latestPostContent: content });
       setAmbiance(result.ambianceDescription);
@@ -171,8 +173,23 @@ export default function Home() {
         description: "Could not update ambiance.",
         variant: "destructive"
       });
+      setAmbiance("A default sunlit meadow, as the AI is resting.");
+    } finally {
+      setAmbianceLoading(false);
     }
-  };
+  }, [toast]);
+  
+  useEffect(() => {
+    // Set initial ambiance
+    const lastPost = posts[posts.length - 1];
+    if (lastPost) {
+        handleUpdateAmbiance(lastPost.content);
+    } else {
+        setAmbiance("The garden is quiet. Plant a new seed to begin.");
+        setAmbianceLoading(false);
+    }
+  }, []);
+
 
   const handleSavePost = (data: { title: string; content: string }) => {
     if (editingPost) {
@@ -287,7 +304,7 @@ export default function Home() {
     return (
       <div
         key={post.id}
-        className={`plant-icon-wrapper absolute transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform duration-300 ${isComposting ? 'plant-composting' : ''} ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
+        className={`plant-icon-wrapper group/plant absolute transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform duration-300 ${isComposting ? 'plant-composting' : ''} ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
         style={{ left: `${post.position.x}%`, top: `${post.position.y}%` }}
         onMouseDown={(e) => !isComposting && handleDragStart(post.id, e)}
         onTouchStart={(e) => !isComposting && handleDragStart(post.id, e)}
@@ -297,7 +314,7 @@ export default function Home() {
         aria-label={`Open post: ${post.title}`}
       >
         <PlantComponent growth={post.growth} />
-        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-background/70 px-2 py-1 rounded-md text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-background/70 px-2 py-1 rounded-md text-xs whitespace-nowrap opacity-0 group-hover/plant:opacity-100 transition-opacity">
           {post.title}
         </span>
       </div>
@@ -306,9 +323,7 @@ export default function Home() {
 
   return (
     <div className={`garden-container min-h-screen w-full font-body ${theme}`}>
-      <header className="absolute top-0 left-0 p-4 z-20">
-        <h1 className="text-4xl font-headline font-bold">Verdant Scribe</h1>
-      </header>
+      <Header />
       
       <main ref={gardenRef} className="relative w-full h-screen overflow-hidden group">
         {posts.map(renderPlant)}
@@ -317,7 +332,14 @@ export default function Home() {
       <Card className="absolute bottom-4 right-4 z-20 bg-background/80 backdrop-blur-sm max-w-xs">
         <CardContent className="p-4">
           <p className="text-sm font-semibold mb-2">Current Ambiance</p>
-          <p className="text-xs text-foreground/80">{ambiance}</p>
+          {ambianceLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+            </div>
+          ) : (
+            <p className="text-xs text-foreground/80">{ambiance}</p>
+          )}
         </CardContent>
       </Card>
 
