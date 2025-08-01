@@ -39,6 +39,10 @@ export default function Home() {
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [compostingPostId, setCompostingPostId] = useState<number | null>(null);
   const [soundType, setSoundType] = useState<SoundType>('wind');
+  const [draggingPostId, setDraggingPostId] = useState<number | null>(null);
+  const [hasDragged, setHasDragged] = useState(false);
+
+  const gardenRef = useRef<HTMLElement>(null);
 
   const [ambiance, setAmbiance] = useState("A sunlit meadow, filled with the gentle hum of life. The air is warm and the sky is clear, inviting new ideas to blossom.");
   const [isSoundOn, setIsSoundOn] = useState(false);
@@ -215,6 +219,60 @@ export default function Home() {
           });
       }
   }, [isSoundOn]);
+  
+  const handleDragStart = (postId: number, event: React.MouseEvent | React.TouchEvent) => {
+    event.preventDefault();
+    setDraggingPostId(postId);
+    setHasDragged(false);
+  };
+
+  const handleDragMove = useCallback((event: MouseEvent | TouchEvent) => {
+    if (draggingPostId === null || !gardenRef.current) return;
+
+    setHasDragged(true);
+    const gardenRect = gardenRef.current.getBoundingClientRect();
+    const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+    
+    let x = ((clientX - gardenRect.left) / gardenRect.width) * 100;
+    let y = ((clientY - gardenRect.top) / gardenRect.height) * 100;
+
+    x = Math.max(0, Math.min(100, x));
+    y = Math.max(0, Math.min(100, y));
+
+    setPosts(prevPosts => prevPosts.map(p => p.id === draggingPostId ? { ...p, position: { x, y } } : p));
+  }, [draggingPostId]);
+
+  const handleDragEnd = useCallback(() => {
+    if (draggingPostId !== null && !hasDragged) {
+      const post = posts.find(p => p.id === draggingPostId);
+      if (post) {
+        setSelectedPost(post);
+      }
+    }
+    setDraggingPostId(null);
+    setHasDragged(false);
+  }, [draggingPostId, hasDragged, posts]);
+
+  useEffect(() => {
+    const moveHandler = (event: MouseEvent | TouchEvent) => handleDragMove(event);
+    const endHandler = () => handleDragEnd();
+
+    if (draggingPostId !== null) {
+      document.addEventListener('mousemove', moveHandler);
+      document.addEventListener('touchmove', moveHandler);
+      document.addEventListener('mouseup', endHandler);
+      document.addEventListener('touchend', endHandler);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', moveHandler);
+      document.removeEventListener('touchmove', moveHandler);
+      document.removeEventListener('mouseup', endHandler);
+      document.removeEventListener('touchend', endHandler);
+    };
+  }, [draggingPostId, handleDragMove, handleDragEnd]);
+
 
   const renderPlant = (post: Post) => {
     const PlantComponent = {
@@ -224,13 +282,15 @@ export default function Home() {
     }[post.type];
 
     const isComposting = post.id === compostingPostId;
+    const isDragging = post.id === draggingPostId;
 
     return (
       <div
         key={post.id}
-        className={`plant-icon-wrapper absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform duration-300 ${isComposting ? 'plant-composting' : ''}`}
+        className={`plant-icon-wrapper absolute transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform duration-300 ${isComposting ? 'plant-composting' : ''} ${isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab'}`}
         style={{ left: `${post.position.x}%`, top: `${post.position.y}%` }}
-        onClick={() => !isComposting && setSelectedPost(post)}
+        onMouseDown={(e) => !isComposting && handleDragStart(post.id, e)}
+        onTouchStart={(e) => !isComposting && handleDragStart(post.id, e)}
         onKeyDown={(e) => e.key === 'Enter' && !isComposting && setSelectedPost(post)}
         role="button"
         tabIndex={0}
@@ -250,7 +310,7 @@ export default function Home() {
         <h1 className="text-4xl font-headline font-bold">Verdant Scribe</h1>
       </header>
       
-      <main className="relative w-full h-screen overflow-hidden group">
+      <main ref={gardenRef} className="relative w-full h-screen overflow-hidden group">
         {posts.map(renderPlant)}
       </main>
 
