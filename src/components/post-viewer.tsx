@@ -93,12 +93,14 @@ export default function PostViewer({ post, onClose, onUpdateGrowth, onEdit, onCo
       <SheetContent className="flex flex-col sm:max-w-xl bg-card">
         <SheetHeader className="pr-12">
           <SheetTitle className="text-3xl font-headline">{post.title}</SheetTitle>
-          <SheetDescription className="flex items-center gap-4 text-sm">
-             <span>A {post.type} in your garden. Reading this helps it grow.</span>
-            <Badge variant="secondary" className="gap-1.5">
-              <Clock className="w-3.5 h-3.5" />
-              {readingTime} min read
-            </Badge>
+          <SheetDescription asChild>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>A {post.type} in your garden. Reading this helps it grow.</span>
+              <Badge variant="secondary" className="gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                {readingTime} min read
+              </Badge>
+            </div>
           </SheetDescription>
         </SheetHeader>
         <div className="relative">
