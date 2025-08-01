@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import PostViewer from '@/components/post-viewer';
 import PostEditor from '@/components/post-editor';
 import GardenControls from '@/components/garden-controls';
-import { FlowerIcon, TreeIcon, VineIcon } from '@/components/plant-icons';
+import { FlowerIcon, TreeIcon, VineIcon, BonsaiIcon, WildflowerIcon, MushroomIcon } from '@/components/plant-icons';
 import { setGardenAmbiance } from '@/ai/flows/set-garden-ambiance';
 import { useToast } from "@/hooks/use-toast";
 import * as Tone from 'tone';
@@ -17,6 +17,9 @@ const initialPosts: Post[] = [
   { id: 1, title: "First Sprout", content: "This is the first entry in my digital garden. A small idea, a seed of thought, planted and waiting to grow. The journey begins with a single step, or in this case, a single word.", type: 'flower', position: { x: 20, y: 30 }, growth: 0.4 },
   { id: 2, title: "A Sturdy Thought", content: "Some ideas are like trees, they take time to root and develop. This is one such thought, a long-form piece on the nature of creativity and the slow, deliberate process of building something meaningful. This can be a long text to check the reading time functionality. The average reading speed is about 200 to 250 words per minute. So a text of about 400 words should take about 2 minutes to read. I will keep writing to make sure the text is long enough for testing purposes. More words, more words, more words. The more words the better the test. This is getting a bit repetitive, but it's for a good cause. We are building a beautiful and mindful application here. And that requires some dedication and some long texts for testing. I think this should be enough now.", type: 'tree', position: { x: 70, y: 65 }, growth: 0.6 },
   { id: 3, title: "Winding Paths", content: "A short story, a narrative that twists and turns. It doesn't follow a straight line, but meanders through different perspectives, much like a vine finding its way.", type: 'vine', position: { x: 45, y: 50 }, growth: 0.8 },
+  { id: 4, title: "Bonsai: Focus", content: "Clarity comes not from more, but from less. Pruning the unnecessary reveals the essential. This is the art of focus, a tiny essay on a single, powerful idea.", type: 'bonsai', position: { x: 80, y: 20 }, growth: 0.5 },
+  { id: 5, title: "Wildflower: Link to an inspiring article", content: "I found this wonderful piece on regenerative design. A quick thought: it mirrors how we should cultivate our own ideas—sustainably and with care. [Link here]", type: 'wildflower', position: { x: 15, y: 70 }, growth: 0.3 },
+  { id: 6, title: "Mushroom: A Moment to Breathe", content: "Let's take a pause. Inhale for four counts, hold for four, exhale for six. Repeat three times. Notice the stillness. This is a small exercise in mindfulness.", type: 'mushroom', position: { x: 55, y: 15 }, growth: 0.7 },
 ];
 
 const getThemeFromAmbiance = (description: string): string => {
@@ -197,7 +200,7 @@ export default function Home() {
       setPosts(updatedPosts);
       handleUpdateAmbiance(data.content);
     } else {
-      const plantTypes: PlantType[] = ['flower', 'tree', 'vine'];
+      const plantTypes: PlantType[] = ['flower', 'tree', 'vine', 'bonsai', 'wildflower', 'mushroom'];
       const newPost: Post = {
         id: Date.now(),
         ...data,
@@ -296,6 +299,9 @@ export default function Home() {
       flower: FlowerIcon,
       tree: TreeIcon,
       vine: VineIcon,
+      bonsai: BonsaiIcon,
+      wildflower: WildflowerIcon,
+      mushroom: MushroomIcon,
     }[post.type];
 
     const isComposting = post.id === compostingPostId;

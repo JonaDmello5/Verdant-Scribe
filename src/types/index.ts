@@ -1,4 +1,4 @@
-export type PlantType = 'flower' | 'tree' | 'vine';
+export type PlantType = 'flower' | 'tree' | 'vine' | 'bonsai' | 'wildflower' | 'mushroom';
 
 export type Post = {
   id: number;

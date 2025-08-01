@@ -90,3 +90,74 @@ export function VineIcon({ growth, ...props }: PlantIconProps) {
     </svg>
   );
 }
+
+export function BonsaiIcon({ growth, ...props }: PlantIconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100"
+      height="100"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ transform: `scale(${0.5 + growth * 0.8})`, opacity: 0.5 + growth * 0.5, transition: 'transform 0.5s, opacity 0.5s' }}
+      {...props}
+    >
+      <path d="M12 20h.01" />
+      <path d="M10 20v-2.5c0-.83.67-1.5 1.5-1.5h1c.83 0 1.5.67 1.5 1.5V20" stroke="#a16207" strokeWidth={1.5 + growth} />
+      <path d="M14 17.5c0-1.16-.84-2.5-2-2.5s-2 1.34-2 2.5" stroke="#a16207" strokeWidth={1.5 + growth} />
+      {growth > 0.3 && <path d="M16 16c0-1.5-1-3-4-3s-4 1.5-4 3" fill="#166534" stroke="#15803d" strokeWidth={1 + growth} />}
+      <path d="M3 20h18" stroke="#78350f" strokeWidth="2" />
+    </svg>
+  );
+}
+
+export function WildflowerIcon({ growth, ...props }: PlantIconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100"
+      height="100"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ transform: `scale(${0.5 + growth * 0.8})`, opacity: 0.5 + growth * 0.5, transition: 'transform 0.5s, opacity 0.5s' }}
+      {...props}
+    >
+      {growth > 0.2 && <path d="M12 22V12" stroke="#4d7c0f" strokeWidth={1 + growth} />}
+      <path d="M12 12 a 2 2 0 0 1 0 -4" fill="#fbbf24" transform="rotate(20 12 10)" />
+      <path d="M12 12 a 2 2 0 0 1 0 -4" fill="#f472b6" transform="rotate(160 12 10)"/>
+      <path d="M12 12 a 2 2 0 0 1 0 -4" fill="#60a5fa" transform="rotate(280 12 10)"/>
+    </svg>
+  );
+}
+
+export function MushroomIcon({ growth, ...props }: PlantIconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100"
+      height="100"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ transform: `scale(${0.5 + growth * 0.8})`, opacity: 0.5 + growth * 0.5, transition: 'transform 0.5s, opacity 0.5s' }}
+      {...props}
+    >
+      <path d="M20 11.5c0-4.42-3.58-8-8-8s-8 3.58-8 8" fill="#ef4444" stroke="#b91c1c" strokeWidth={1 + growth} />
+      <path d="M12 21.5v-10" stroke="#fde68a" strokeWidth={1.5 + growth} />
+      {growth > 0.5 && <circle cx="10" cy="8" r="0.5" fill="white" />}
+      {growth > 0.6 && <circle cx="14" cy="8" r="0.5" fill="white" />}
+      {growth > 0.7 && <circle cx="12" cy="5" r="0.5" fill="white" />}
+    </svg>
+  );
+}
