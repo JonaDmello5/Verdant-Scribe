@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Twitter, Github } from "lucide-react";
+import { Mail, Github } from "lucide-react";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -36,13 +36,13 @@ export default function Footer() {
         {/* Right — social icons */}
         <div className="flex gap-4 text-xl">
           <a
-            href="https://twitter.com/"
-            aria-label="Twitter"
+            href="mailto:hello@verdant-scribe.com"
+            aria-label="Email"
             target="_blank"
             rel="noopener"
             className="hover:text-primary"
           >
-            <Twitter className="h-5 w-5" />
+            <Mail className="h-5 w-5" />
           </a>
           <a
             href="https://github.com/"
