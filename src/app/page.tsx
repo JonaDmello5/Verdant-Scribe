@@ -30,7 +30,7 @@ const getThemeFromAmbiance = (description: string): string => {
   return 'theme-sunlit'; // Default to sunlit
 };
 
-export type SoundType = 'wind' | 'rain';
+export type SoundType = 'wind' | 'rain' | 'pad';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
@@ -48,6 +48,8 @@ export default function Home() {
   const windSynth = useRef<Tone.NoiseSynth | null>(null);
   const windFilter = useRef<Tone.AutoFilter | null>(null);
   const rainSynth = useRef<Tone.NoiseSynth | null>(null);
+  const padSynth = useRef<Tone.PolySynth | null>(null);
+  const padSequence = useRef<Tone.Sequence | null>(null);
 
   const theme = useMemo(() => getThemeFromAmbiance(ambiance), [ambiance]);
 
@@ -67,6 +69,19 @@ export default function Home() {
         rainSynth.current?.dispose();
         rainSynth.current = null;
       }, 500);
+    }
+    if (padSynth.current) {
+        padSynth.current.releaseAll();
+        setTimeout(() => {
+            padSynth.current?.dispose();
+            padSynth.current = null;
+        }, 500);
+    }
+    if (padSequence.current) {
+        padSequence.current.stop(0);
+        padSequence.current.clear();
+        padSequence.current.dispose();
+        padSequence.current = null;
     }
     Tone.Transport.stop();
     Tone.Transport.cancel();
@@ -103,6 +118,32 @@ export default function Home() {
           envelope: { attack: 0.005, decay: 0.1, sustain: 1 }
         }).toDestination();
         rainSynth.current.triggerAttack();
+    } else if (soundType === 'pad') {
+        padSynth.current = new Tone.PolySynth(Tone.FMSynth, {
+            volume: -18,
+            envelope: {
+                attack: 1.5,
+                decay: 0.5,
+                sustain: 0.5,
+                release: 4,
+            },
+            harmonicity: 1.01,
+            modulationIndex: 1.5,
+        }).toDestination();
+
+        const chords = [
+            { time: "0:0", notes: ["C3", "G3", "E4"] },
+            { time: "0:2", notes: ["G3", "B3", "D4"] },
+            { time: "1:0", notes: ["A3", "C4", "E4"] },
+            { time: "1:2", notes: ["F3", "A3", "C4"] },
+        ];
+        
+        padSequence.current = new Tone.Sequence((time, { notes }) => {
+            padSynth.current?.triggerAttackRelease(notes, "2m", time);
+        }, chords, "1m").start(0);
+
+        Tone.Transport.bpm.value = 40;
+        Tone.Transport.start();
     }
   }, [soundType, theme, stopAllAudio, isSoundOn]);
 
