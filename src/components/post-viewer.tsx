@@ -16,7 +16,7 @@ import {
   SheetFooter,
   SheetClose,
 } from '@/components/ui/sheet';
-import { Scissors, Recycle, X, BookOpen, Clock } from 'lucide-react';
+import { Scissors, Recycle, X, Clock } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
