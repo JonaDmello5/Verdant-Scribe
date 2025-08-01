@@ -24,7 +24,7 @@ interface GardenControlsProps {
 
 export default function GardenControls({ onPlantNew, isSoundOn, onToggleSound, soundType, onSoundTypeChange }: GardenControlsProps) {
   return (
-    <div className="absolute bottom-4 left-4 z-20 flex items-center gap-4">
+    <div className="fixed bottom-4 left-4 z-20 flex items-center gap-4">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>

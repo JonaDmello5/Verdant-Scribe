@@ -329,7 +329,7 @@ export default function Home() {
         {posts.map(renderPlant)}
       </main>
 
-      <Card className="absolute bottom-4 right-4 z-20 bg-background/80 backdrop-blur-sm max-w-xs">
+      <Card className="fixed bottom-4 right-4 z-20 bg-background/80 backdrop-blur-sm max-w-xs">
         <CardContent className="p-4">
           <p className="text-sm font-semibold mb-2">Current Ambiance</p>
           {ambianceLoading ? (
