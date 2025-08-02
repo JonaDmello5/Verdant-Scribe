@@ -3,12 +3,12 @@ import {NextResponse} from 'next/server';
 import {Resend} from 'resend';
 import ContactFormEmail from '@/emails/contact-form-email';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const toEmail = 'joeysalakha81@gmail.com';
 
 
 export async function POST(request: Request) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const body = await request.json();
     const {name, email, message} = body;
 
