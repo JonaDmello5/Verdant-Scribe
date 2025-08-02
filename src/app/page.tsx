@@ -176,7 +176,7 @@ export default function Home() {
         description: "Could not update ambiance.",
         variant: "destructive"
       });
-      setAmbiance("A default sunlit meadow, as the AI is resting.");
+      setAmbiance("The garden is peaceful and still, bathed in the gentle warmth of a sunlit meadow.");
     } finally {
       setAmbianceLoading(false);
     }
