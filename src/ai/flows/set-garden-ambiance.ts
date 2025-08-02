@@ -39,16 +39,16 @@ const prompt = ai.definePrompt({
   name: 'setGardenAmbiancePrompt',
   input: {schema: SetGardenAmbianceInputSchema},
   output: {schema: SetGardenAmbianceOutputSchema},
-  prompt: `You are an expert digital garden designer. You will analyze the latest post content and determine the appropriate ambiance for the garden, considering both visual and auditory elements.
+  prompt: `You are a poetic digital garden designer. Your task is to evoke a mood that mirrors the provided text. Create a short, beautiful, and imaginative description of a garden scene.
 
 Latest Post Content: {{{latestPostContent}}}
 
-Based on the content above, describe the ideal garden ambiance. Consider the following aspects:
+Based on the content above, describe the ideal garden ambiance. Be evocative. Think about light, color, and feeling.
 
-*   Visual elements: Overall lighting (e.g., sunny, moonlit, misty), color palette, and any specific visual features (e.g., flowers, trees, winding vines).
-*   Auditory elements: Ambient sounds that would complement the visual ambiance (e.g., gentle wind, chirping crickets, somber music).
+*   **Visuals**: Is it a sun-drenched meadow, a misty moonlit clearing, a rain-slicked path at twilight? Describe the quality of light, the dominant colors, and one or two key natural features (e.g., ancient stones, swaying willows, vibrant moss).
+*   **Sounds**: The only available ambient sounds are **wind**, **gentle rain**, or a **soft musical pad**. Describe which of these sounds would best complement your visual scene. For example, is it the sound of wind whispering through tall grass, the gentle patter of a brief shower on broad leaves, or a soft, ambient chord that hangs in the air?
 
-Provide a concise description of the ambiance that captures the essence of the post's mood.`,
+Craft a single, flowing paragraph that brings this scene to life, creating a peaceful and contemplative atmosphere that enhances the user's connection to their writing.`,
 });
 
 const setGardenAmbianceFlow = ai.defineFlow(
