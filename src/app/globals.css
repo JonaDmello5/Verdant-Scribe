@@ -95,10 +95,6 @@
   color: #e9ecef;
 }
 
-.theme-misty .plant-icon-wrapper {
-  filter: brightness(0.9) saturate(0.8);
-}
-
 .plant-composting {
   animation: compost-animation 1s forwards;
 }
