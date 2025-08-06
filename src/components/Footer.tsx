@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -18,6 +19,9 @@ export default function Footer() {
         <nav className="flex flex-wrap gap-4">
           <Link href="/" className="hover:underline">
             Home
+          </Link>
+          <Link href="/garden" className="hover:underline">
+            Garden
           </Link>
           <Link href="/about" className="hover:underline">
             About
