@@ -34,9 +34,9 @@ export default function LandingPage() {
           <div className="container mx-auto max-w-5xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
             <div>
               <Image 
-                src="https://storage.googleapis.com/aif-stg-images-1240/f3e722a4-f91b-43e7-b6fe-2b8d0a0d9229.png" 
-                alt="A collection of colorful, stylized flowers."
-                data-ai-hint="colorful flowers"
+                src="https://placehold.co/600x400.png" 
+                alt="A placeholder image representing a garden."
+                data-ai-hint="garden illustration"
                 width={600}
                 height={400}
                 className="rounded-lg shadow-xl"
