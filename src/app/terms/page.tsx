@@ -1,8 +1,12 @@
 import Link from 'next/link';
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Terms of Service | Verdant Scribe',
   description: 'The rules of the garden. Our commitment to you and your creative space.',
+  alternates: {
+    canonical: '/terms',
+  },
 };
 
 export default function Terms() {

@@ -1,10 +1,14 @@
 import Image from 'next/image';
 import { Mail, Github, Leaf, TreeDeciduous, Grape, Scissors, Sprout, Footprints } from 'lucide-react';
 import { Logo } from '@/components/logo';
+import Head from 'next/head';
 
 export const metadata = {
   title: 'About | Verdant Scribe',
-  description: 'Meet the gardeners behind the words.',
+  description: 'Meet the gardeners behind the words and discover the philosophy of our digital sanctuary.',
+  alternates: {
+    canonical: '/about',
+  },
 };
 
 const plants = [
@@ -48,6 +52,11 @@ const plants = [
 
 export default function About() {
   return (
+    <>
+    <Head>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9370081174240595"
+     crossOrigin="anonymous"></script>
+    </Head>
     <main className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto max-w-4xl px-4 py-16">
         <header className="text-center mb-16">
@@ -63,7 +72,7 @@ export default function About() {
             <Logo className="w-48 h-48 text-foreground" />
             <div className="prose dark:prose-invert max-w-none">
                 <p className="text-xl leading-relaxed">
-                    🌱 Verdant Scribe is a digital garden tended by <strong>Salakha and Patil</strong>, two creators passionate about mindful productivity, sustainable technology, and the quiet power of words. We believe that the process of writing and thinking should be as natural and life-giving as tending to a garden.
+                    🌱 Verdant Scribe is a digital garden tended by <strong>Salakha and Patil</strong>, two creators passionate about mindful productivity, sustainable technology, and the quiet power of words. We believe that the process of writing and thinking should be as natural and life-giving as tending to a garden. This project was born from a desire to move away from the rigid, linear structure of traditional note-taking apps and embrace a more organic, visual, and contemplative approach. We wanted to create a tool that not only helps you organize your thoughts but also encourages a deeper, more mindful connection with your own creative process.
                 </p>
             </div>
         </section>
@@ -71,12 +80,15 @@ export default function About() {
         <section className="mb-20 text-center">
           <h2 className="text-3xl font-bold font-headline mb-4">Our Mission</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            To create a sanctuary for writers and thinkers—a tool that transforms the act of journaling into a visual, meditative experience. We aim to help you cultivate your ideas with the same care and patience as a gardener tends to their plants, fostering growth both for your thoughts and for your own well-being.
+            To create a sanctuary for writers and thinkers—a tool that transforms the act of journaling into a visual, meditative experience. We aim to help you cultivate your ideas with the same care and patience as a gardener tends to their plants, fostering growth both for your thoughts and for your own well-being. Our core philosophy is built on the principles of slow technology and digital wellness. We're not focused on cramming in features for the sake of productivity, but on crafting an environment that feels calming, inspiring, and deeply personal. We believe your best ideas need space to breathe and grow, not to be confined in a sterile list.
           </p>
         </section>
         
         <section className="mb-16">
           <h2 className="text-3xl font-bold font-headline text-center mb-12">The Life of the Garden</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10">
+            In Verdant Scribe, every piece of writing is a living part of your garden. We use the metaphor of different plants to represent different kinds of thoughts. This isn't just a gimmick; it's a way to encourage varied thinking and to visually organize your mental landscape. A fleeting idea might be a wildflower, while a foundational essay could become a sturdy tree. This system helps you see, at a glance, the shape and texture of your intellectual journey.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {plants.map((plant) => (
                 <div key={plant.name} className="bg-card p-6 rounded-xl shadow-md border border-border/50 hover:shadow-lg transition-shadow duration-300">
@@ -119,5 +131,6 @@ export default function About() {
 
       </div>
     </main>
+    </>
   );
 }

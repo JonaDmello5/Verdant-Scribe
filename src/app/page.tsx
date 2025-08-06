@@ -6,6 +6,12 @@ import Header from '@/components/header';
 import Image from 'next/image';
 import Head from 'next/head';
 
+export const metadata = {
+  alternates: {
+    canonical: '/',
+  },
+}
+
 export default function LandingPage() {
   return (
     <>
@@ -40,7 +46,7 @@ export default function LandingPage() {
           <div className="container mx-auto max-w-5xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
             <div>
               <Image 
-                src="/images/image.png" 
+                src="https://placehold.co/600x400.png" 
                 alt="A placeholder image representing a garden."
                 data-ai-hint="garden illustration"
                 width={600}
