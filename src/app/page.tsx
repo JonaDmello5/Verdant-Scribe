@@ -28,7 +28,7 @@ export default function LandingPage() {
             Welcome to Verdant Scribe
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            A digital sanctuary where your thoughts can grow. Verdant Scribe is a new kind of journaling app that turns your words into a beautiful, ever-evolving digital garden. Each entry you write blossoms into a unique plant, creating a visual representation of your creative journey. Our goal is to provide a calm, organic, and visually rewarding journaling experience. We believe that by transforming the act of writing into a more mindful and creative process, we can help you cultivate not just your ideas, but also a deeper sense of well-being.
+            Step into a digital sanctuary where your thoughts don't just exist—they grow. Verdant Scribe reimagines journaling as an act of cultivation. Here, each entry you write blossoms into a unique plant, transforming your words into a beautiful, ever-evolving digital garden. Witness a visual representation of your inner world, where fleeting ideas become wildflowers and deep reflections grow into sturdy oaks. Our purpose is to offer a calm, organic, and deeply rewarding space for your mind. We believe that by weaving mindfulness into the creative process, you can cultivate not just your ideas, but a profound sense of well-being.
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild size="lg">
