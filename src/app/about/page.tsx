@@ -107,7 +107,7 @@ export default function About() {
             <h2 className="text-3xl font-bold font-headline mb-4">Elsewhere</h2>
             <div className="flex justify-center gap-6 text-xl">
                 <a
-                    href="mailto:hello@verdant-scribe.com"
+                    href="mailto:joeysalakha81@gmail.com"
                     aria-label="Email"
                     target="_blank"
                     rel="noopener"

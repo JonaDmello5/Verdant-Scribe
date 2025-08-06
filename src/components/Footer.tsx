@@ -40,7 +40,7 @@ export default function Footer() {
         {/* Right — social icons */}
         <div className="flex gap-4 text-xl">
           <a
-            href="mailto:hello@verdant-scribe.com"
+            href="mailto:joeysalakha81@gmail.com"
             aria-label="Email"
             target="_blank"
             rel="noopener"
