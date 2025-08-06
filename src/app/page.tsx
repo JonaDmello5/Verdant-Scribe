@@ -28,7 +28,7 @@ export default function LandingPage() {
             Welcome to Verdant Scribe
           </h1>
           <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-            A digital sanctuary where your thoughts can grow. Verdant Scribe is a new kind of journaling app that turns your words into a beautiful, ever-evolving digital garden. Each entry you write blossoms into a unique plant, creating a visual representation of your creative journey.
+            A digital sanctuary where your thoughts can grow. Verdant Scribe is a new kind of journaling app that turns your words into a beautiful, ever-evolving digital garden. Each entry you write blossoms into a unique plant, creating a visual representation of your creative journey. Our goal is to provide a calm, organic, and visually rewarding journaling experience. We believe that by transforming the act of writing into a more mindful and creative process, we can help you cultivate not just your ideas, but also a deeper sense of well-being.
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild size="lg">
@@ -46,8 +46,8 @@ export default function LandingPage() {
           <div className="container mx-auto max-w-5xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
             <div>
               <Image 
-                src="https://placehold.co/600x400.png" 
-                alt="A placeholder image representing a garden."
+                src="/images/image.png" 
+                alt="A beautiful illustration of a lush garden with various plants and flowers."
                 data-ai-hint="garden illustration"
                 width={600}
                 height={400}
