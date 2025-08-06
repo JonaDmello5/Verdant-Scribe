@@ -117,7 +117,7 @@ export default function About() {
                     <span className="text-base">Email Us</span>
                 </a>
                 <a
-                    href="#"
+                    href="https://github.com/JonaDmello5/Verdant-Scribe"
                     aria-label="GitHub"
                     target="_blank"
                     rel="noopener"

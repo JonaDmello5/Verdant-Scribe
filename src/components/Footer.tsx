@@ -49,7 +49,7 @@ export default function Footer() {
             <Mail className="h-5 w-5" />
           </a>
           <a
-            href="https://github.com/"
+            href="https://github.com/JonaDmello5/Verdant-Scribe"
             aria-label="GitHub"
             target="_blank"
             rel="noopener"
